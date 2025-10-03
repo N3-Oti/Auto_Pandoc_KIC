@@ -35,23 +35,50 @@ jobs:
               with:
                   pandoc-version: "latest"
 
-            # 4. pandoc-crossrefをダウンロードしてインストールする (修正版)
+            # 4. pandoc-crossrefをダウンロードしてインストールする (改善版)
             - name: Install pandoc-crossref
               run: |
-                  echo "Fetching latest pandoc-crossref release URL..."
-                  # GitHub APIに認証付きで問い合わせるように修正
-                  LATEST_URL=$(curl -sL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/lierdakil/pandoc-crossref/releases/latest" | grep "browser_download_url.*Linux.tar.xz" | cut -d '"' -f 4)
+                  echo "Fetching latest pandoc-crossref release information..."
 
-                  # URLが取得できたか確認する
+                  # GitHub APIからリリース情報を取得
+                  RELEASE_INFO=$(curl -sL \
+                    -H "Accept: application/vnd.github+json" \
+                    -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "X-GitHub-Api-Version: 2022-11-28" \
+                    "https://api.github.com/repos/lierdakil/pandoc-crossref/releases/latest")
+
+                  # デバッグ：利用可能なアセット名を表示
+                  echo "Available assets:"
+                  echo "$RELEASE_INFO" | grep -o '"name": *"[^"]*"' | cut -d'"' -f4
+
+                  # Linux用のtar.xzファイルを検索（複数パターンに対応）
+                  LATEST_URL=$(echo "$RELEASE_INFO" | grep -oP '"browser_download_url":\s*"\K[^"]*Linux[^"]*\.tar\.xz' | head -n 1)
+
+                  # URLが取得できたか確認
                   if [ -z "$LATEST_URL" ]; then
                     echo "Error: Could not retrieve the download URL."
-                    exit 1
+                    echo "Trying alternative method..."
+                    
+                    # 代替方法：jqを使用してJSONを解析
+                    sudo apt-get update && sudo apt-get install -y jq
+                    LATEST_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | test("Linux.*\\.tar\\.xz$")) | .browser_download_url' | head -n 1)
+                    
+                    if [ -z "$LATEST_URL" ]; then
+                      echo "Error: Still could not retrieve the download URL."
+                      exit 1
+                    fi
                   fi
 
                   echo "Downloading from: $LATEST_URL"
                   wget -q -O pandoc-crossref.tar.xz "$LATEST_URL"
-                  tar -xvf pandoc-crossref.tar.xz
+
+                  # 解凍してインストール
+                  tar -xf pandoc-crossref.tar.xz
                   sudo mv pandoc-crossref /usr/local/bin/
+                  sudo chmod +x /usr/local/bin/pandoc-crossref
+
+                  # インストール確認
+                  pandoc-crossref --version
                   echo "pandoc-crossref installed successfully."
 
             # 5. Pythonスクリプトを実行してWordドキュメントをビルドする
