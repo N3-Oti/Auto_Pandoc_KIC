@@ -21,12 +21,19 @@ def find_markdown_files(directory="."):
     Returns:
         list: Markdownファイルのパスのリスト
     """
+    # まずルートディレクトリを検索
     md_files = glob.glob(os.path.join(directory, "*.md"))
+    
+    # chapters/ フォルダも検索
+    chapters_dir = os.path.join(directory, "chapters")
+    if os.path.exists(chapters_dir):
+        md_files.extend(glob.glob(os.path.join(chapters_dir, "*.md")))
+    
     md_files.sort()
     return md_files
 
 
-def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=True):
+def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=True, bibliography=None):
     """
     Pandocを実行してWordドキュメントを生成する
     
@@ -35,6 +42,7 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
         output_file: 出力ファイル名
         reference_doc: 参照用のWordテンプレート (オプション)
         filter_crossref: pandoc-crossrefフィルターを使用するか
+        bibliography: 参考文献ファイル (オプション)
     """
     
     if not source_files:
@@ -52,9 +60,16 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     if filter_crossref:
         cmd.extend(["--filter", "pandoc-crossref"])
     
+    # citeproc for bibliography
+    cmd.extend(["--citeproc"])
+    
     if reference_doc and os.path.exists(reference_doc):
         cmd.extend(["--reference-doc", reference_doc])
         print(f"参照テンプレート: {reference_doc}")
+    
+    if bibliography and os.path.exists(bibliography):
+        cmd.extend(["--bibliography", bibliography])
+        print(f"参考文献: {bibliography}")
     
     cmd.extend(["-M", "autoSectionLabels=true"])
     cmd.extend([
@@ -101,16 +116,29 @@ def main():
     
     output_file = "修士論文_氏名.docx"
     
-    reference_doc = "reference.docx"
-    if not os.path.exists(reference_doc):
-        reference_doc = None
-        print("注意: reference.docx が見つかりません（テンプレートなしで変換）\n")
+    # テンプレートファイルを検索（複数の候補を試す）
+    reference_doc = None
+    for template_name in ["template.docx", "reference.docx"]:
+        if os.path.exists(template_name):
+            reference_doc = template_name
+            break
+    
+    if not reference_doc:
+        print("注意: テンプレートファイルが見つかりません（デフォルトスタイルで変換）\n")
+    
+    # 参考文献ファイルを検索
+    bibliography = None
+    for bib_name in ["references.bib", "bibliography.bib"]:
+        if os.path.exists(bib_name):
+            bibliography = bib_name
+            break
     
     run_pandoc(
         source_files=markdown_files,
         output_file=output_file,
         reference_doc=reference_doc,
-        filter_crossref=True
+        filter_crossref=True,
+        bibliography=bibliography
     )
     
     print()
