@@ -1,0 +1,57 @@
+# ワークフローの名前（GitHubのActions画面で表示されます）
+name: Build Thesis Document
+
+# ワークフローが実行される "きっかけ" (Event)
+on:
+    # mainブランチかmasterブランチにプッシュされた時
+    push:
+        branches:
+            - main
+            - master
+    # 手動でも実行できるようにする（Actionsタブにボタンができます）
+    workflow_dispatch:
+
+# 実行される作業内容 (Job)
+jobs:
+    build:
+        # "ubuntu" というOSの最新版PC（仮想マシン）で作業します
+        runs-on: ubuntu-latest
+
+        # 具体的な作業手順 (Steps)
+        steps:
+            # ステップ1: リポジトリのファイルを仮想マシンにコピーする
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            # ステップ2: Python環境を準備する
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            # ステップ3: Pandoc環境を準備する
+            - name: Set up Pandoc
+              uses: r-lib/actions/setup-pandoc@v2
+              with:
+                  pandoc-version: "latest"
+
+            # ステップ4: pandoc-crossrefをダウンロードしてインストールする
+            - name: Install pandoc-crossref
+              run: |
+                  LATEST_URL=$(curl -sL "https://api.github.com/repos/lierdakil/pandoc-crossref/releases/latest" | grep "browser_download_url.*Linux.tar.xz" | cut -d '"' -f 4)
+                  wget -O pandoc-crossref.tar.xz "$LATEST_URL"
+                  tar -xvf pandoc-crossref.tar.xz
+                  sudo mv pandoc-crossref /usr/local/bin/
+
+            # ステップ5: Pythonスクリプトを実行してWordドキュメントをビルドする
+            - name: Run Pandoc Runner Script
+              run: python3 pandoc_runner.py
+
+            # ステップ6: 完成したWordファイルを「成果物(Artifact)」として保存する
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  # 成果物の名前（ダウンロード時のzipファイル名になります）
+                  name: thesis-document
+                  # 保存したいファイルのパス (pandoc_runner.pyの出力ファイル名と一致させる)
+                  path: 修士論文_氏名.docx

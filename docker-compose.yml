@@ -1,0 +1,11 @@
+# サービス（コンテナ）の定義
+services:
+  # サービス名は自由（ここでは "builder" とする）
+  builder:
+    # カレントディレクトリのDockerfileを使ってイメージをビルド
+    build: .
+    # ホストPCの現在地をコンテナの/dataに同期（マウント）
+    volumes:
+      - .:/data
+    # コンテナ起動時に実行するコマンド
+    command: python3 pandoc_runner.py
