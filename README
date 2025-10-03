@@ -1,0 +1,17 @@
+```
+### 使い方
+
+
+プロジェクトのルートに **`chapters`** という名前の新しいフォルダを作成してください。
+
+**フォルダ構成の例:**
+修士論文/
+├── 📁 chapters/              <-- 論文本体のフォルダ
+│   ├── 📄 01_intro.md
+│   └── 📄 02_method.md
+├── 🐍 pandoc_runner.py       
+├── 🐳 Dockerfile
+├── 🐳 docker-compose.yml
+├── 📚 references.bib         <-- 参考文献のファイル
+└── 🎨 template.docx          <-- テンプレートのファイル
+```
