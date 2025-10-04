@@ -41,12 +41,41 @@ jobs:
                   sudo apt-get update
                   sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended
 
-            # 5. pandoc-crossrefをインストールする（バージョン固定）
+            # 5. pandoc-crossrefをインストールする（動的取得）
             - name: Install pandoc-crossref
               run: |
-                  # 安定版のpandoc-crossrefをダウンロード
-                  wget -q https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.15.0a/pandoc-crossref-Linux.tar.xz
-                  tar -xf pandoc-crossref-Linux.tar.xz
+                  echo "Fetching latest pandoc-crossref release information..."
+
+                  # jqをインストール
+                  sudo apt-get update && sudo apt-get install -y jq
+
+                  # GitHub APIからリリース情報を取得
+                  RELEASE_INFO=$(curl -sL \
+                    -H "Accept: application/vnd.github+json" \
+                    -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "X-GitHub-Api-Version: 2022-11-28" \
+                    "https://api.github.com/repos/lierdakil/pandoc-crossref/releases/latest")
+
+                  # デバッグ：利用可能なアセット名を表示
+                  echo "Available assets:"
+                  echo "$RELEASE_INFO" | jq -r '.assets[].name'
+
+                  # Linux用のtar.xzファイルを検索
+                  LATEST_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | test("Linux.*\\.tar\\.xz$")) | .browser_download_url' | head -n 1)
+
+                  # URLが取得できたか確認
+                  if [ -z "$LATEST_URL" ] || [ "$LATEST_URL" = "null" ]; then
+                    echo "Error: Could not retrieve the download URL."
+                    echo "Available assets:"
+                    echo "$RELEASE_INFO" | jq -r '.assets[].name'
+                    exit 1
+                  fi
+
+                  echo "Downloading from: $LATEST_URL"
+                  wget -q -O pandoc-crossref.tar.xz "$LATEST_URL"
+
+                  # 解凍してインストール
+                  tar -xf pandoc-crossref.tar.xz
                   sudo mv pandoc-crossref /usr/local/bin/
                   sudo chmod +x /usr/local/bin/pandoc-crossref
 
