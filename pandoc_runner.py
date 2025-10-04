@@ -10,6 +10,9 @@ import sys
 import glob
 from pathlib import Path
 
+title = "修士論文"
+author = "氏名"
+file_name = f"{title}_{author}"
 
 def find_markdown_files(directory="."):
     """
@@ -66,7 +69,10 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     if reference_doc and os.path.exists(reference_doc):
         cmd.extend(["--reference-doc", reference_doc])
         print(f"参照テンプレート: {reference_doc}")
-    
+    else:
+        cmd.extend(["-d", "defaults.yaml"])
+        print("defaults.yamlを使用します。")
+
     if bibliography and os.path.exists(bibliography):
         cmd.extend(["--bibliography", bibliography])
         print(f"参考文献: {bibliography}")
@@ -114,7 +120,8 @@ def main():
         print("カレントディレクトリに .md ファイルを配置してください")
         sys.exit(1)
     
-    output_file = "修士論文_氏名.docx"
+    # 複数の出力ファイルを生成
+    output_files = [f"{file_name}.docx", f"{file_name}.pdf"]
     
     # テンプレートファイルを検索（複数の候補を試す）
     reference_doc = None
@@ -133,9 +140,19 @@ def main():
             bibliography = bib_name
             break
     
+    # Word文書を生成
     run_pandoc(
         source_files=markdown_files,
-        output_file=output_file,
+        output_file=f"{file_name}.docx",
+        reference_doc=reference_doc,
+        filter_crossref=True,
+        bibliography=bibliography
+    )
+    
+    # PDF文書を生成（別途実行）
+    run_pandoc(
+        source_files=markdown_files,
+        output_file=f"{file_name}.pdf",
         reference_doc=reference_doc,
         filter_crossref=True,
         bibliography=bibliography
