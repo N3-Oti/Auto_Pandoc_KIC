@@ -93,5 +93,5 @@ jobs:
                   name: thesis-document
                   # アップロードするファイルのパス
                   path: |
-                      **/*.docx
-                      **/*.pdf
+                  **/*.docx
+                  **/*.pdf
