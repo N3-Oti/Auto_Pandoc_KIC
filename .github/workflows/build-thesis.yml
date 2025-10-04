@@ -92,6 +92,4 @@ jobs:
                   # アーティファクトの名前
                   name: thesis-document
                   # アップロードするファイルのパス
-                  path: |
-                  修士論文_氏名.docx
-                  修士論文_氏名.pdf
+                  path: 修士論文_氏名.docx
