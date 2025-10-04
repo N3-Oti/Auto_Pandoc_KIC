@@ -35,7 +35,7 @@ jobs:
               with:
                   pandoc-version: "latest"
 
-            # 4. pandoc-crossrefをダウンロードしてインストールする
+            # 4. pandoc-crossrefをダウンロードしてインストールする (改善版)
             - name: Install pandoc-crossref
               run: |
                   echo "Fetching latest pandoc-crossref release information..."
@@ -81,11 +81,11 @@ jobs:
                   pandoc-crossref --version
                   echo "pandoc-crossref installed successfully."
 
-            # 5. Pythonスクリプトを実行してドキュメントをビルドする
+            # 5. Pythonスクリプトを実行してWordドキュメントをビルドする
             - name: Run Pandoc Runner Script
               run: python3 pandoc_runner.py
 
-            # 6. 生成されたファイルをアーティファクトとしてアップロードする
+            # 6. 生成されたWordファイルをアーティファクトとしてアップロードする
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:
@@ -93,5 +93,5 @@ jobs:
                   name: thesis-document
                   # アップロードするファイルのパス
                   path: |
-                  *.docx
-                  *.pdf
+                  修士論文_氏名.docx
+                  修士論文_氏名.pdf
