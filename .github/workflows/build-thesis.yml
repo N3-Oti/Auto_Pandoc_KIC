@@ -33,13 +33,13 @@ jobs:
             - name: Set up Pandoc
               uses: r-lib/actions/setup-pandoc@v2
               with:
-                  pandoc-version: "3.1.2" # 安定版に固定
+                  pandoc-version: "3.8" # pandoc-crossrefと互換性のあるバージョン
 
             # 4. LaTeX環境をインストールする
-            - name: Install LaTeX
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended
+            #- name: Install LaTeX
+            #  run: |
+            #      sudo apt-get update
+            #      sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended
 
             # 5. pandoc-crossrefをインストールする（動的取得）
             - name: Install pandoc-crossref
