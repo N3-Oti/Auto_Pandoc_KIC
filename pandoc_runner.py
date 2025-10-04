@@ -140,7 +140,7 @@ def main():
             bibliography = bib_name
             break
     
-    # Word文書のみを生成
+    # Word文書を生成
     run_pandoc(
         source_files=markdown_files,
         output_file=f"{file_name}.docx",
@@ -149,14 +149,14 @@ def main():
         bibliography=bibliography
     )
     
-    # PDF生成
-    # run_pandoc(
-    #     source_files=markdown_files,
-    #     output_file=f"{file_name}.pdf",
-    #     reference_doc=reference_doc,
-    #     filter_crossref=True,
-    #     bibliography=bibliography
-    # )
+    # PDF文書を生成（別途実行）
+    run_pandoc(
+        source_files=markdown_files,
+        output_file=f"{file_name}.pdf",
+        reference_doc=reference_doc,
+        filter_crossref=True,
+        bibliography=bibliography
+    )
     
     print()
     print("=" * 60)
