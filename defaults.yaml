@@ -1,0 +1,10 @@
+from: markdown
+standalone: true
+number-sections: true
+toc: true
+toc-title: "目次"
+metadata:
+  autoSectionLabels: true
+filters:
+  - pandoc-crossref
+  - filters/japanese_chapter.lua
