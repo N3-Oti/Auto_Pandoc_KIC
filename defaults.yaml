@@ -8,6 +8,9 @@ lot: true
 lot-title: "表目次"
 lof: true
 lof-title: "図目次"
+variables:
+  documentclass: bxjsreport
+  classoption: pandoc,titlepage
 metadata:
   autoSectionLabels: true
 filters:
