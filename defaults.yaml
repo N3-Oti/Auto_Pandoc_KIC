@@ -5,9 +5,8 @@ toc: true
 toc-title: "目次"
 toc-depth: 3
 lot: true
-lot-title: "表目次"
 lof: true
-lof-title: "図目次"
+
 variables:
   fontsize: 11pt
   documentclass: bxjsreport
