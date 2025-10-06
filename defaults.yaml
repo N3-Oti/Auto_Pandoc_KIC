@@ -1,5 +1,6 @@
 # トップレベルのオプション
 from: markdown
+to: docx
 standalone: true
 number-sections: true
 toc: true
@@ -10,6 +11,7 @@ lof: true
 # フィルターの設定
 filters:
   - pandoc-crossref
+  - filters/japanese_chapter.lua
 
 # 文書全体のメタデータ
 metadata:
@@ -33,12 +35,7 @@ variables:
   indent: true
   papersize: a4
 
-  header-includes:
-    - \usepackage{titlesec}
-    - \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{第\thechapter章}{20pt}{\Huge}
-    - \renewcommand{\thesection}{\thechapter.\arabic{section}}
-    - \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
-    - \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+  # Word出力ではLaTeXの設定は効かないため削除
   
   # 各種タイトルの設定
   toc-title: "目次"

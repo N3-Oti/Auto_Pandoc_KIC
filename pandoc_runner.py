@@ -150,9 +150,9 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
         print("設定ファイル: defaults.yaml")
     else:
         print("警告: defaults.yamlが見つかりません。デフォルト設定を使用します。")
-    
-    if filter_crossref:
-        cmd.extend(["--filter", "pandoc-crossref"])
+        # defaults.yamlがない場合のフォールバック設定
+        if filter_crossref:
+            cmd.extend(["--filter", "pandoc-crossref"])
     
     # citeproc for bibliography
     cmd.extend(["--citeproc"])
