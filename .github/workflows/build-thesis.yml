@@ -92,7 +92,7 @@ jobs:
       - name: Run Pandoc Runner Script
         run: python3 pandoc_runner.py
 
-      # 7. 生成された論文ファイルのみをアーティファクトとしてアップロードする
+      # 7. 生成されたWordファイルをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
