@@ -8,7 +8,91 @@ import os
 import subprocess
 import sys
 import glob
+import re
+import yaml
 from pathlib import Path
+
+
+def extract_metadata_from_title_file(title_file_path):
+    """
+    00_title.mdからメタデータを抽出する
+    
+    Args:
+        title_file_path: タイトルファイルのパス
+    
+    Returns:
+        dict: 抽出されたメタデータ（title, author, date等）
+    """
+    if not os.path.exists(title_file_path):
+        print(f"警告: タイトルファイルが見つかりません: {title_file_path}")
+        return None
+    
+    try:
+        with open(title_file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # YAMLフロントマターを抽出
+        yaml_match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
+        if yaml_match:
+            yaml_content = yaml_match.group(1)
+            metadata = yaml.safe_load(yaml_content)
+            return metadata
+        else:
+            print(f"警告: {title_file_path}にYAMLフロントマターが見つかりません")
+            return None
+            
+    except Exception as e:
+        print(f"エラー: {title_file_path}の読み込みに失敗しました: {e}")
+        return None
+
+
+def generate_filename_from_metadata(metadata):
+    """
+    メタデータからファイル名を生成する
+    
+    Args:
+        metadata: 抽出されたメタデータ
+    
+    Returns:
+        str: 生成されたファイル名
+    """
+    if not metadata:
+        return "修士論文_氏名.docx"
+    
+    # タイトルを取得（最初のタイトルを使用）
+    title = metadata.get('title', '修士論文')
+    if isinstance(title, list):
+        title = title[0]
+    
+    # 著者を取得
+    author = metadata.get('author', '氏名')
+    if isinstance(author, list):
+        author = author[0]
+    
+    # ファイル名に使用できない文字を置換
+    def sanitize_filename(text):
+        # ファイル名に使用できない文字を置換
+        invalid_chars = r'[<>:"/\\|?*]'
+        text = re.sub(invalid_chars, '_', text)
+        # 連続するアンダースコアを単一に
+        text = re.sub(r'_+', '_', text)
+        # 先頭末尾のアンダースコアを削除
+        text = text.strip('_')
+        return text
+    
+    # タイトルを簡潔にする（長すぎる場合は省略）
+    clean_title = sanitize_filename(title)
+    if len(clean_title) > 30:
+        clean_title = clean_title[:30] + "..."
+    
+    # 著者名を簡潔にする
+    clean_author = sanitize_filename(author)
+    
+    # ファイル名を生成
+    filename = f"{clean_title}_{clean_author}.docx"
+    
+    print(f"生成されたファイル名: {filename}")
+    return filename
 
 
 def find_markdown_files(directory="."):
@@ -107,14 +191,37 @@ def main():
     current_dir = os.getcwd()
     print(f"作業ディレクトリ: {current_dir}\n")
     
+    # タイトルファイルからメタデータを抽出
+    title_file_candidates = [
+        "chapters/00_title.md",
+        "00_title.md",
+        "chapters/title.md",
+        "title.md"
+    ]
+    
+    metadata = None
+    title_file_path = None
+    
+    for candidate in title_file_candidates:
+        if os.path.exists(candidate):
+            title_file_path = candidate
+            print(f"タイトルファイルを発見: {candidate}")
+            metadata = extract_metadata_from_title_file(candidate)
+            break
+    
+    if not metadata:
+        print("警告: タイトルファイルからメタデータを抽出できませんでした")
+        print("デフォルトのファイル名を使用します")
+    
+    # ファイル名を生成
+    output_file = generate_filename_from_metadata(metadata)
+    
     markdown_files = find_markdown_files()
     
     if not markdown_files:
         print("警告: Markdownファイルが見つかりません")
         print("カレントディレクトリに .md ファイルを配置してください")
         sys.exit(1)
-    
-    output_file = "修士論文_氏名.docx"
     
     # テンプレートファイルを検索（複数の候補を試す）
     reference_doc = None
