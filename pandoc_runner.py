@@ -78,6 +78,9 @@ def generate_filename_from_metadata(metadata):
         text = re.sub(r'_+', '_', text)
         # 先頭末尾のアンダースコアを削除
         text = text.strip('_')
+        # スペースと全角スペースをアンダースコアに置換
+        text = text.replace(" ", "_")
+        text = text.replace("　", "_")
         return text
     
     # タイトルを簡潔にする（長すぎる場合は省略）
@@ -89,7 +92,7 @@ def generate_filename_from_metadata(metadata):
     clean_author = sanitize_filename(author)
     
     # ファイル名を生成
-    filename = f"{clean_title}_{clean_author}.docx"
+    filename = f"{clean_author}_manuscript.docx"
     
     print(f"生成されたファイル名: {filename}")
     return filename
@@ -159,7 +162,7 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     cmd.extend([
         "--standalone",
         "--toc",
-        "--number-sections",
+    #    "--number-sections",
     ])
     
     print(f"\n実行コマンド:")
