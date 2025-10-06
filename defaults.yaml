@@ -9,8 +9,23 @@ lot-title: "表目次"
 lof: true
 lof-title: "図目次"
 variables:
+  fontsize: 11pt
   documentclass: bxjsreport
-  classoption: pandoc,titlepage
+  classoption:
+    - pandoc
+    - jafont=ms
+    - titlepage
+  mainfont: "Times New Roman"
+  sansfont: "Times New Roman"
+  indent: true
+  header-includes:
+    - \renewcommand{\thesection}{第\arabic{section}章}
+    - \renewcommand{\thesubsection}{\arabic{section}-\arabic{subsection}}
+    - \renewcommand{\thesubsubsection}{\arabic{section}-\arabic{subsection}-\arabic{subsubsection}}
+  chaptersDepth: 2
+  titlepage: true
+  papersize: a4
+
 metadata:
   autoSectionLabels: true
 filters:

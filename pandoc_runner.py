@@ -147,9 +147,6 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     if filter_crossref:
         cmd.extend(["--filter", "pandoc-crossref"])
     
-    # Japanese chapter filterを追加
-    cmd.extend(["--lua-filter", "filters/japanese_chapter.lua"])
-    
     # citeproc for bibliography
     cmd.extend(["--citeproc"])
     
@@ -171,18 +168,9 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
         "--number-sections",  # 章番号を有効化
     ])
     
-    # 日本語の目次タイトルを設定
-    cmd.extend(["-V", "toc-title=目次"])
-    cmd.extend(["-V", "lot-title=表目次"])
-    cmd.extend(["-V", "lof-title=図目次"])
-    
     # ドキュメントクラスとオプションを設定
     cmd.extend(["-V", "documentclass=bxjsreport"])
     cmd.extend(["-V", "classoption=pandoc,titlepage"])
-    
-    # タイトルページを目次から除外するための設定
-    cmd.extend(["-V", "toc-nonfloat=true"])
-    cmd.extend(["-V", "toc-depth=3"])
     
     print(f"\n実行コマンド:")
     print(" ".join(cmd))
