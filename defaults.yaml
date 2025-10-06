@@ -18,8 +18,8 @@ variables:
   indent: true
   header-includes:
     - \renewcommand{\thesection}{第\arabic{section}章}
-    - \renewcommand{\thesubsection}{\arabic{section}-\arabic{subsection}}
-    - \renewcommand{\thesubsubsection}{\arabic{section}-\arabic{subsection}-\arabic{subsubsection}}
+    - \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+    - \renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
   chaptersDepth: 2
   titlepage: true
   papersize: a4
@@ -40,4 +40,3 @@ metadata:
 
 filters:
   - pandoc-crossref
-  - filters/japanese_chapter.lua
