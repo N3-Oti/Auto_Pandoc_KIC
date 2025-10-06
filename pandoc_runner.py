@@ -166,6 +166,9 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
         "--lot",  # List of Tables (表目次)
         "--lof",  # List of Figures (図目次)
         "--number-sections",  # 章番号を有効化
+        "--variable toc-title=目次",
+        "--variable lot-title=表目次",
+        "--variable lof-title=図目次",
     ])
     
     # ドキュメントクラスとオプションを設定
