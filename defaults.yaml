@@ -1,3 +1,4 @@
+# トップレベルのメタデータ
 from: markdown
 standalone: true
 number-sections: true
@@ -6,37 +7,46 @@ toc-depth: 3
 lot: true
 lof: true
 
+# LaTeXのプリアンブルに挿入する内容
+header-includes:
+  # 1. タイトルフォーマットを変更する titlesec パッケージを読み込む
+  - \usepackage{titlesec}
+  
+  # 2. \chapter (Markdownの # に対応) のフォーマットを「第X章 タイトル」の形式にする
+  - \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{第\thechapter章}{20pt}{\Huge}
+  
+  # 3. \section (##) と \subsection (###) の番号を章から始まる階層形式にする
+  - \renewcommand{\thesection}{\thechapter.\arabic{section}}
+  - \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+  - \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+
+# テンプレートに渡す変数
 variables:
   fontsize: 11pt
   documentclass: bxjsreport
   classoption:
     - pandoc
-    - jafont=ms
-    - titlepage
-  mainfont: "Times New Roman"
-  sansfont: "Times New Roman"
+    - jafont=ms  # MSフォント（明朝・ゴシック）を使う指定
+    - titlepage  # 独立したタイトルページを生成する
+  mainfont: "Times New Roman"  # (jafont指定時、欧文フォントのみに影響)
+  sansfont: "Times New Roman"  # (jafont指定時、欧文フォントのみに影響)
   indent: true
-  header-includes:
-    - \renewcommand{\thesection}{第\arabic{section}章}
-    - \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
-    - \renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
-  chaptersDepth: 2
-  titlepage: true
   papersize: a4
   toc-title: "目次"
   lot-title: "表目次"
   lof-title: "図目次"
-  figureTitle: "図 "
-  tableTitle: "表 "
-  listingTitle: "コード "
-  figPrefix: "図."
-  eqnPrefix: "式."
-  tblPrefix: "表."
-  lstPrefix: "コード."
-  chapDelim: "-"
-
-metadata:
-  autoSectionLabels: true
-
+  
+# pandoc-crossref フィルター用の変数
 filters:
   - pandoc-crossref
+metadata:
+  autoSectionLabels: true
+  # pandoc-crossref 用の接頭辞設定
+  figPrefix: "図 " # 図のキャプション接頭辞
+  tblPrefix: "表 " # 表のキャプション接頭辞
+  lstPrefix: "コード " # コードブロックのキャプション接頭辞
+  figureTitle: "図 "   # (古い形式。上記で十分な場合が多い)
+  tableTitle: "表 "    # (古い形式。上記で十分な場合が多い)
+  listingTitle: "コード " # (古い形式。上記で十分な場合が多い)
+  # 参照時の接頭辞
+  chapDelim: "." # 相互参照時の区切り文字（例: 図 1.1）
