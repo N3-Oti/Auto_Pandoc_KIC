@@ -1,4 +1,4 @@
-# トップレベルのメタデータ
+# トップレベルのオプション
 from: markdown
 standalone: true
 number-sections: true
@@ -7,18 +7,18 @@ toc-depth: 3
 lot: true
 lof: true
 
-# LaTeXのプリアンブルに挿入する内容
-header-includes:
-  # 1. タイトルフォーマットを変更する titlesec パッケージを読み込む
-  - \usepackage{titlesec}
-  
-  # 2. \chapter (Markdownの # に対応) のフォーマットを「第X章 タイトル」の形式にする
-  - \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{第\thechapter章}{20pt}{\Huge}
-  
-  # 3. \section (##) と \subsection (###) の番号を章から始まる階層形式にする
-  - \renewcommand{\thesection}{\thechapter.\arabic{section}}
-  - \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
-  - \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+# フィルターの設定
+filters:
+  - pandoc-crossref
+
+# 文書全体のメタデータ
+metadata:
+  autoSectionLabels: true
+  # pandoc-crossref 用の接頭辞設定
+  figPrefix: "図 "
+  tblPrefix: "表 "
+  lstPrefix: "コード "
+  chapDelim: "."
 
 # テンプレートに渡す変数
 variables:
@@ -26,27 +26,21 @@ variables:
   documentclass: bxjsreport
   classoption:
     - pandoc
-    - jafont=ms  # MSフォント（明朝・ゴシック）を使う指定
-    - titlepage  # 独立したタイトルページを生成する
-  mainfont: "Times New Roman"  # (jafont指定時、欧文フォントのみに影響)
-  sansfont: "Times New Roman"  # (jafont指定時、欧文フォントのみに影響)
+    - jafont=ms
+    - titlepage
+  mainfont: "Times New Roman"
+  sansfont: "Times New Roman"
   indent: true
   papersize: a4
+
+  header-includes:
+    - \usepackage{titlesec}
+    - \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{第\thechapter章}{20pt}{\Huge}
+    - \renewcommand{\thesection}{\thechapter.\arabic{section}}
+    - \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+    - \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+  
+  # 各種タイトルの設定
   toc-title: "目次"
   lot-title: "表目次"
   lof-title: "図目次"
-  
-# pandoc-crossref フィルター用の変数
-filters:
-  - pandoc-crossref
-metadata:
-  autoSectionLabels: true
-  # pandoc-crossref 用の接頭辞設定
-  figPrefix: "図 " # 図のキャプション接頭辞
-  tblPrefix: "表 " # 表のキャプション接頭辞
-  lstPrefix: "コード " # コードブロックのキャプション接頭辞
-  figureTitle: "図 "   # (古い形式。上記で十分な場合が多い)
-  tableTitle: "表 "    # (古い形式。上記で十分な場合が多い)
-  listingTitle: "コード " # (古い形式。上記で十分な場合が多い)
-  # 参照時の接頭辞
-  chapDelim: "." # 相互参照時の区切り文字（例: 図 1.1）
