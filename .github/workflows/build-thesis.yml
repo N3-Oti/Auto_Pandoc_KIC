@@ -8,7 +8,7 @@ on:
     branches:
       - main
       - master
-      - feature/reference
+
   # 手動でも実行できるようにする
   workflow_dispatch:
 
