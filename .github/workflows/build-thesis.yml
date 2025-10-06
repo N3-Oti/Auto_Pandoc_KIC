@@ -45,6 +45,8 @@ jobs:
       # 5. pandoc-crossrefをダウンロードしてインストールする
       - name: Install pandoc-crossref
         run: |
+          # アーキテクチャを確認
+          echo "Current architecture: $(uname -m)"
           echo "Fetching latest pandoc-crossref release information..."
 
           # GitHub APIからリリース情報を取得
@@ -58,17 +60,17 @@ jobs:
           echo "Available assets:"
           echo "$RELEASE_INFO" | grep -o '"name": *"[^"]*"' | cut -d'"' -f4
 
-          # Linux用のtar.xzファイルを検索（複数パターンに対応）
-          LATEST_URL=$(echo "$RELEASE_INFO" | grep -oP '"browser_download_url":\s*"\K[^"]*Linux[^"]*\.tar\.xz' | head -n 1)
+          # Linux用のtar.xzファイルを検索（X64アーキテクチャを優先）
+          LATEST_URL=$(echo "$RELEASE_INFO" | grep -oP '"browser_download_url":\s*"\K[^"]*Linux-X64[^"]*\.tar\.xz' | head -n 1)
 
           # URLが取得できたか確認
           if [ -z "$LATEST_URL" ]; then
             echo "Error: Could not retrieve the download URL."
             echo "Trying alternative method..."
             
-            # 代替方法：jqを使用してJSONを解析
+            # 代替方法：jqを使用してJSONを解析（X64アーキテクチャを優先）
             sudo apt-get update && sudo apt-get install -y jq
-            LATEST_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | test("Linux.*\\.tar\\.xz$")) | .browser_download_url' | head -n 1)
+            LATEST_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | test("Linux-X64.*\\.tar\\.xz$")) | .browser_download_url' | head -n 1)
             
             if [ -z "$LATEST_URL" ]; then
               echo "Error: Still could not retrieve the download URL."
@@ -85,8 +87,16 @@ jobs:
           sudo chmod +x /usr/local/bin/pandoc-crossref
 
           # インストール確認
-          pandoc-crossref --version
-          echo "pandoc-crossref installed successfully."
+          echo "Verifying installation..."
+          if /usr/local/bin/pandoc-crossref --version; then
+            echo "✓ pandoc-crossref installed successfully."
+          else
+            echo "✗ pandoc-crossref installation verification failed."
+            echo "File info:"
+            file /usr/local/bin/pandoc-crossref
+            ls -la /usr/local/bin/pandoc-crossref
+            exit 1
+          fi
 
       # 6. Pythonスクリプトを実行してWordドキュメントをビルドする
       - name: Run Pandoc Runner Script
