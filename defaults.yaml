@@ -2,7 +2,6 @@ from: markdown
 standalone: true
 number-sections: true
 toc: true
-toc-title: "目次"
 toc-depth: 3
 lot: true
 lof: true
@@ -24,9 +23,9 @@ variables:
   chaptersDepth: 2
   titlepage: true
   papersize: a4
-
-metadata:
-  autoSectionLabels: true
+  toc-title: "目次"
+  lot-title: "表目次"
+  lof-title: "図目次"
   figureTitle: "図 "
   tableTitle: "表 "
   listingTitle: "コード "
@@ -35,6 +34,9 @@ metadata:
   tblPrefix: "表."
   lstPrefix: "コード."
   chapDelim: "-"
+
+metadata:
+  autoSectionLabels: true
 
 filters:
   - pandoc-crossref
