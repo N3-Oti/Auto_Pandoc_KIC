@@ -88,47 +88,15 @@ jobs:
           pandoc-crossref --version
           echo "pandoc-crossref installed successfully."
 
-      # 6. 生成されるファイル名を取得
-      - name: Get generated filename
-        id: get-filename
-        run: |
-          # Pythonスクリプトを実行してファイル名を取得
-          FILENAME=$(python3 -c "
-          import sys
-          sys.path.append('.')
-          from pandoc_runner import extract_metadata_from_title_file, generate_filename_from_metadata
-
-          # タイトルファイルからメタデータを抽出
-          title_file_candidates = [
-              'chapters/00_title.md',
-              '00_title.md',
-              'chapters/title.md',
-              'title.md'
-          ]
-
-          metadata = None
-          for candidate in title_file_candidates:
-              import os
-              if os.path.exists(candidate):
-                  metadata = extract_metadata_from_title_file(candidate)
-                  break
-
-          filename = generate_filename_from_metadata(metadata)
-          print(filename)
-          ")
-
-          echo "Generated filename: $FILENAME"
-          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
-
-      # 7. Pythonスクリプトを実行してWordドキュメントをビルドする
+      # 6. Pythonスクリプトを実行してWordドキュメントをビルドする
       - name: Run Pandoc Runner Script
         run: python3 pandoc_runner.py
 
-      # 8. 生成されたWordファイルをアーティファクトとしてアップロードする
+      # 7. 生成されたWordファイルをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           # アーティファクトの名前
           name: thesis-document
-          # アップロードするファイルのパス
-          path: ${{ steps.get-filename.outputs.filename }}
+          # アップロードするファイルのパス（ワイルドカードを使用）
+          path: "*.docx"

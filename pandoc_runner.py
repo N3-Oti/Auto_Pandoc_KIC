@@ -248,6 +248,14 @@ def main():
         bibliography=bibliography
     )
     
+    # GitHub Actions用にファイル名を環境変数として出力
+    if os.environ.get('GITHUB_ACTIONS'):
+        # ファイル名を環境変数として設定
+        os.environ['GENERATED_FILENAME'] = output_file
+        # GitHub Actionsの出力として設定
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f"filename={output_file}\n")
+    
     print()
     print("=" * 60)
     print("変換完了!")
