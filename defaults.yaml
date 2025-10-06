@@ -36,7 +36,7 @@ metadata:
   tblPrefix: "表."
   lstPrefix: "コード."
   chapDelim: "-"
-  
+
 filters:
   - pandoc-crossref
   - filters/japanese_chapter.lua

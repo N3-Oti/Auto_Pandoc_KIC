@@ -144,6 +144,13 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     cmd.extend(source_files)
     cmd.extend(["-o", output_file])
     
+    # defaults.yamlを使用
+    if os.path.exists("defaults.yaml"):
+        cmd.extend(["--defaults", "defaults.yaml"])
+        print("設定ファイル: defaults.yaml")
+    else:
+        print("警告: defaults.yamlが見つかりません。デフォルト設定を使用します。")
+    
     if filter_crossref:
         cmd.extend(["--filter", "pandoc-crossref"])
     
@@ -157,23 +164,6 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     if bibliography and os.path.exists(bibliography):
         cmd.extend(["--bibliography", bibliography])
         print(f"参考文献: {bibliography}")
-    
-    cmd.extend(["-M", "autoSectionLabels=true"])
-    cmd.extend([
-        "--standalone",
-        "--toc",
-        "--toc-depth=3",
-        "--lot",  # List of Tables (表目次)
-        "--lof",  # List of Figures (図目次)
-        "--number-sections",  # 章番号を有効化
-        "--variable toc-title=目次",
-        "--variable lot-title=表目次",
-        "--variable lof-title=図目次",
-    ])
-    
-    # ドキュメントクラスとオプションを設定
-    cmd.extend(["-V", "documentclass=bxjsreport"])
-    cmd.extend(["-V", "classoption=pandoc,titlepage"])
     
     print(f"\n実行コマンド:")
     print(" ".join(cmd))
