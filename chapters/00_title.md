@@ -10,5 +10,12 @@ institute: |
 documentclass: bxjsreport  # 日本語の論文に適したクラス
 classoption:
   - "pandoc"
+  - "titlepage"
 toc: true
+toc-title: "目次"
+toc-depth: 3
+lot: true
+lot-title: "表目次"
+lof: true
+lof-title: "図目次"
 ---

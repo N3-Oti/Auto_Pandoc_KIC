@@ -162,6 +162,9 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     cmd.extend([
         "--standalone",
         "--toc",
+        "--toc-depth=3",
+        "--lot",  # List of Tables (表目次)
+        "--lof",  # List of Figures (図目次)
     #    "--number-sections",
     ])
     

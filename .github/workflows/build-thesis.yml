@@ -92,11 +92,13 @@ jobs:
       - name: Run Pandoc Runner Script
         run: python3 pandoc_runner.py
 
-      # 7. 生成されたWordファイルをアーティファクトとしてアップロードする
+      # 7. 生成された論文ファイルのみをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           # アーティファクトの名前
           name: thesis-document
-          # アップロードするファイルのパス（ワイルドカードを使用）
-          path: "*.docx"
+          # アップロードするファイルのパス（reference.docxを除外）
+          path: |
+            *.docx
+            !reference.docx
