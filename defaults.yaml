@@ -28,6 +28,15 @@ variables:
 
 metadata:
   autoSectionLabels: true
+  figureTitle: "図 "
+  tableTitle: "表 "
+  listingTitle: "コード "
+  figPrefix: "図."
+  eqnPrefix: "式."
+  tblPrefix: "表."
+  lstPrefix: "コード."
+  chapDelim: "-"
+  
 filters:
   - pandoc-crossref
   - filters/japanese_chapter.lua
