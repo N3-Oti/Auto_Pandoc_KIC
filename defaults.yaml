@@ -13,6 +13,7 @@ filters:
   - pandoc-crossref
   - filters/japanese_chapter.lua
   - filters/japanese_toc_titles.lua
+  - filters/japanese_paragraph_indent.lua
 
 # 文書全体のメタデータ
 metadata:
