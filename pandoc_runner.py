@@ -144,21 +144,41 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     cmd.extend(source_files)
     cmd.extend(["-o", output_file])
     
-    # defaults.yamlを使用
+    # defaults.yamlを使用（目次タイトル変数は除く）
     if os.path.exists("defaults.yaml"):
-        cmd.extend(["--defaults", "defaults.yaml"])
-        print("設定ファイル: defaults.yaml")
+        # defaults.yamlを読み込んで、目次タイトル変数を除外
+        with open("defaults.yaml", 'r', encoding='utf-8') as f:
+            defaults_content = f.read()
+        
+        # 目次タイトル変数を一時的に削除
+        import tempfile
+        import re
+        modified_content = re.sub(r'^\s*toc-title:.*$', '', defaults_content, flags=re.MULTILINE)
+        modified_content = re.sub(r'^\s*lot-title:.*$', '', modified_content, flags=re.MULTILINE)
+        modified_content = re.sub(r'^\s*lof-title:.*$', '', modified_content, flags=re.MULTILINE)
+        
+        # 一時ファイルに書き込み
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False, encoding='utf-8') as temp_file:
+            temp_file.write(modified_content)
+            temp_yaml_path = temp_file.name
+        
+        cmd.extend(["--defaults", temp_yaml_path])
+        print("設定ファイル: defaults.yaml (目次タイトル変数除外)")
+        
+        # 後で一時ファイルを削除
+        import atexit
+        atexit.register(lambda: os.unlink(temp_yaml_path) if os.path.exists(temp_yaml_path) else None)
     else:
         print("警告: defaults.yamlが見つかりません。デフォルト設定を使用します。")
         # defaults.yamlがない場合のフォールバック設定
         if filter_crossref:
             cmd.extend(["--filter", "pandoc-crossref"])
     
-    # 目次タイトルの日本語化のため、直接変数を指定
+    # 目次タイトルの日本語化のため、強制的に変数を指定
     cmd.extend(["-V", "toc-title=目次"])
     cmd.extend(["-V", "lot-title=表目次"])
     cmd.extend(["-V", "lof-title=図目次"])
-    print("目次タイトル変数を直接指定: toc-title=目次, lot-title=表目次, lof-title=図目次")
+    print("目次タイトル変数を強制指定: toc-title=目次, lot-title=表目次, lof-title=図目次")
     
     # citeproc for bibliography
     cmd.extend(["--citeproc"])
