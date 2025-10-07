@@ -16,39 +16,25 @@ local function get_header_text(content)
     return text:gsub("^%s*(.-)%s*$", "%1") -- 前後の空白を削除
 end
 
--- Pandocのtable_of_contents関数を使用して目次を生成
-function Pandoc(doc)
-    -- 既存の目次を検索して置換
-    local blocks = doc.blocks
+-- より直接的なアプローチ：すべてのテキスト要素をチェック
+function Str(s)
+    local text = s.text
     
-    for i, block in ipairs(blocks) do
-        if block.t == "TableOfContents" then
-            print("TableOfContents要素を検出しました")
-            -- 目次を日本語タイトルで再生成
-            local toc = pandoc.utils.table_of_contents(doc.blocks, {
-                depth = 3,
-                default_section_numbering = true
-            })
-            
-            -- 目次のタイトルを日本語に変更
-            if toc and #toc.blocks > 0 then
-                for j, toc_block in ipairs(toc.blocks) do
-                    if toc_block.t == "Header" and toc_block.level == 1 then
-                        local header_text = get_header_text(toc_block.content)
-                        if header_text == "Table of Contents" or header_text == "Contents" then
-                            print("目次タイトルを検出: '" .. header_text .. "' → '目次'")
-                            toc_block.content = {pandoc.Str("目次")}
-                        end
-                    end
-                end
-            end
-            
-            -- 既存の目次を置換
-            blocks[i] = toc
-        end
+    -- 目次タイトルの直接置換
+    if text == "Table of Contents" then
+        print("Str要素で目次タイトルを検出: '" .. text .. "' → '目次'")
+        return pandoc.Str("目次")
+    elseif text == "Contents" then
+        print("Str要素で目次タイトルを検出: '" .. text .. "' → '目次'")
+        return pandoc.Str("目次")
     end
     
-    return pandoc.Pandoc(blocks, doc.meta)
+    return s
+end
+
+-- Pandoc関数は残しておく（将来の拡張用）
+function Pandoc(doc)
+    return doc
 end
 
 -- タイトル変換マップ
