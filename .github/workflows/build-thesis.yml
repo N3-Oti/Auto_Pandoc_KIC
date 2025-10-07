@@ -99,6 +99,7 @@ jobs:
             ./chapters/11_acknowledgements.md
             ./chapters/12_references_heading.md
             ./chapters/13_appendix.md
+            ./chapters/14_pandoc_guide.md
 
       # 6. 変換結果の確認
       - name: Verify conversion results
