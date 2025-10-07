@@ -28,18 +28,49 @@ jobs:
       - name: Create output directory
         run: mkdir -p output
 
-      # 3. reference.docxが存在するかチェック
+      # 3. reference.docxが存在するかチェック（デバッグログ付き）
       - name: Check for reference.docx
         run: |
+          echo "=== DEBUG: Checking for reference.docx ==="
+          echo "Current directory contents:"
+          ls -la
+          echo ""
+          echo "Checking for reference.docx..."
           if [ -f "reference.docx" ]; then
-            echo "reference.docx found, will use as template"
+            echo "✅ reference.docx found!"
+            echo "File size: $(ls -lh reference.docx | awk '{print $5}')"
+            echo "File permissions: $(ls -l reference.docx | awk '{print $1}')"
+            echo "Will use as template"
             echo "REFERENCE_DOC=--reference-doc=reference.docx" >> $GITHUB_ENV
           else
-            echo "reference.docx not found, using default template"
+            echo "❌ reference.docx not found"
+            echo "Available .docx files:"
+            ls -la *.docx 2>/dev/null || echo "No .docx files found"
+            echo "Using default template"
             echo "REFERENCE_DOC=" >> $GITHUB_ENV
           fi
+          echo "REFERENCE_DOC environment variable set to: ${{ env.REFERENCE_DOC }}"
+          echo "=== END DEBUG ==="
 
-      # 4. Pandocとpandoc-crossrefを使用してドキュメントを変換
+      # 4. Pandocコマンドの詳細ログを表示
+      - name: Show Pandoc command details
+        run: |
+          echo "=== DEBUG: Pandoc Command Details ==="
+          echo "REFERENCE_DOC: ${{ env.REFERENCE_DOC }}"
+          echo "Full command will be:"
+          echo "pandoc --defaults=defaults.yaml --citeproc --bibliography=references.bib ${{ env.REFERENCE_DOC }} -V toc-title=目次 -V lot-title=表目次 -V lof-title=図目次 --filter=pandoc-crossref --output=output/thesis.docx [chapter files]"
+          echo ""
+          echo "Checking input files:"
+          for file in ./chapters/*.md; do
+            if [ -f "$file" ]; then
+              echo "✅ $file ($(ls -lh "$file" | awk '{print $5}'))"
+            else
+              echo "❌ $file (not found)"
+            fi
+          done
+          echo "=== END DEBUG ==="
+
+      # 5. Pandocとpandoc-crossrefを使用してドキュメントを変換
       # 公式例に基づいて、Dockerイメージを直接使用
       - name: Convert documents with Pandoc
         uses: docker://pandoc/latex:3.5
@@ -69,7 +100,23 @@ jobs:
             ./chapters/12_references_heading.md
             ./chapters/13_appendix.md
 
-      # 5. 生成されたWordファイルをアーティファクトとしてアップロードする
+      # 6. 変換結果の確認
+      - name: Verify conversion results
+        run: |
+          echo "=== DEBUG: Conversion Results ==="
+          echo "Output directory contents:"
+          ls -la output/
+          echo ""
+          if [ -f "output/thesis.docx" ]; then
+            echo "✅ thesis.docx created successfully!"
+            echo "File size: $(ls -lh output/thesis.docx | awk '{print $5}')"
+            echo "File permissions: $(ls -l output/thesis.docx | awk '{print $1}')"
+          else
+            echo "❌ thesis.docx not found in output directory"
+          fi
+          echo "=== END DEBUG ==="
+
+      # 7. 生成されたWordファイルをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
