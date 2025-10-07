@@ -1,5 +1,5 @@
 ---
-title: 修士論文のタイトル
+title: PANDOCシステムを利用した修士論文の書き方：ここにはタイトルを書く
 author:
   - 21XXX 山田 太郎
 supervisor: 嶋 久登 教授
