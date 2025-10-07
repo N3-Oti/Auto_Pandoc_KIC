@@ -73,6 +73,12 @@ function Header(el)
 
         el.content:insert(1, pandoc.Space())
         el.content:insert(1, prefix)
+        
+        -- デバッグ用の出力（実際の動作確認用）
+        print("章番号付与: " .. tostring(chapter_count) .. " - " .. header_text)
+    else
+        -- デバッグ用の出力（実際の動作確認用）
+        print("除外: " .. header_text)
     end
 
     return el
