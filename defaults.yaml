@@ -2,7 +2,7 @@
 from: markdown
 to: docx
 standalone: true
-number-sections: false
+number-sections: true
 toc: true
 toc-depth: 3
 lot: true
