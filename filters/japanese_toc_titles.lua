@@ -10,18 +10,27 @@ local title_mapping = {
     ["Contents"] = "目次",
     ["TABLE OF CONTENTS"] = "目次",
     ["CONTENTS"] = "目次",
+    ["目次"] = "目次", -- 既に日本語の場合
     
     -- 図目次関連
     ["List of Figures"] = "図目次",
     ["Figures"] = "図目次",
     ["LIST OF FIGURES"] = "図目次",
     ["FIGURES"] = "図目次",
+    ["図目次"] = "図目次", -- 既に日本語の場合
     
     -- 表目次関連
     ["List of Tables"] = "表目次",
     ["Tables"] = "表目次",
     ["LIST OF TABLES"] = "表目次",
-    ["TABLES"] = "表目次"
+    ["TABLES"] = "表目次",
+    ["表目次"] = "表目次", -- 既に日本語の場合
+    
+    -- リスト目次関連
+    ["List of Listings"] = "コード目次",
+    ["Listings"] = "コード目次",
+    ["LIST OF LISTINGS"] = "コード目次",
+    ["LISTINGS"] = "コード目次"
 }
 
 -- ヘッダーテキストを取得するヘルパー関数
@@ -116,6 +125,13 @@ function Blocks(blocks)
             if title_mapping[header_text] then
                 print("Blocks内タイトル変換: '" .. header_text .. "' → '" .. title_mapping[header_text] .. "'")
                 block.content = {pandoc.Str(title_mapping[header_text])}
+            end
+        elseif block.t == "Para" then
+            -- 段落もチェック（目次タイトルが段落として生成される場合）
+            local para_text = get_header_text(block.content)
+            if para_text ~= "" and title_mapping[para_text] then
+                print("Blocks内段落タイトル変換: '" .. para_text .. "' → '" .. title_mapping[para_text] .. "'")
+                block.content = {pandoc.Str(title_mapping[para_text])}
             end
         end
     end
