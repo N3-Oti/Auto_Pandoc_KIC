@@ -1,6 +1,8 @@
  -- Word出力用の目次タイトル日本語化フィルター
 -- Word出力では変数設定が効かない場合があるため、フィルターで処理
 
+print("目次タイトル日本語化フィルターが開始されました")
+
 -- タイトル変換マップ
 local title_mapping = {
     -- 目次関連
@@ -37,9 +39,10 @@ end
 
 -- Header要素の処理
 function Header(el)
-    -- 第1レベルのヘッダーをチェック（目次タイトルは通常第1レベル）
+    -- デバッグ出力：すべての第1レベルヘッダーを確認
     if el.level == 1 then
         local header_text = get_header_text(el.content)
+        print("第1レベルヘッダー検出: '" .. header_text .. "'")
         
         -- タイトルマッピングをチェック
         if title_mapping[header_text] then
@@ -50,6 +53,8 @@ function Header(el)
             el.content = new_content
             
             return el
+        else
+            print("変換対象外: '" .. header_text .. "'")
         end
     end
     
@@ -60,15 +65,20 @@ end
 function Para(el)
     local para_text = get_header_text(el.content)
     
-    -- タイトルマッピングをチェック
-    if title_mapping[para_text] then
-        print("段落タイトル変換: '" .. para_text .. "' → '" .. title_mapping[para_text] .. "'")
+    -- 空でない段落のみチェック
+    if para_text ~= "" then
+        print("段落テキスト検出: '" .. para_text .. "'")
         
-        -- 新しい日本語タイトルで置換
-        local new_content = {pandoc.Str(title_mapping[para_text])}
-        el.content = new_content
-        
-        return el
+        -- タイトルマッピングをチェック
+        if title_mapping[para_text] then
+            print("段落タイトル変換: '" .. para_text .. "' → '" .. title_mapping[para_text] .. "'")
+            
+            -- 新しい日本語タイトルで置換
+            local new_content = {pandoc.Str(title_mapping[para_text])}
+            el.content = new_content
+            
+            return el
+        end
     end
     
     return el
@@ -80,6 +90,7 @@ function Div(el)
     if el.classes then
         for _, class in ipairs(el.classes) do
             if class == "TOC" or class == "toc" or class == "lot" or class == "lof" then
+                print("目次関連Div検出: " .. class)
                 -- TOC内の要素を再帰的に処理
                 return el:walk({
                     Header = Header,
@@ -90,4 +101,24 @@ function Div(el)
     end
     
     return el
+end
+
+-- すべての要素をチェックするための汎用フィルター
+function Blocks(blocks)
+    print("Blocks要素処理開始: " .. #blocks .. "個のブロック")
+    
+    -- 各ブロックを処理
+    for i, block in ipairs(blocks) do
+        if block.t == "Header" and block.level == 1 then
+            local header_text = get_header_text(block.content)
+            print("Blocks内第1レベルヘッダー: '" .. header_text .. "'")
+            
+            if title_mapping[header_text] then
+                print("Blocks内タイトル変換: '" .. header_text .. "' → '" .. title_mapping[header_text] .. "'")
+                block.content = {pandoc.Str(title_mapping[header_text])}
+            end
+        end
+    end
+    
+    return blocks
 end

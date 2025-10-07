@@ -94,23 +94,6 @@ function Header(el)
         return make_unnumbered(el)
     end
     
-    -- 第2レベルのヘッダー（セクション）の処理
-    if el.level == 2 and current_chapter > 0 then
-        section_counts[current_chapter] = section_counts[current_chapter] + 1
-        local section_num = section_counts[current_chapter]
-        
-        -- カスタムセクション番号を付与
-        local prefix = pandoc.Str(tostring(current_chapter) .. "." .. tostring(section_num))
-        el.content:insert(1, pandoc.Space())
-        el.content:insert(1, prefix)
-        
-        local header_text = get_header_text(el.content)
-        print("セクション番号付与: " .. tostring(current_chapter) .. "." .. tostring(section_num) .. " - " .. header_text)
-        
-        -- Pandocの自動番号付けを無効化
-        return make_unnumbered(el)
-    end
-    
     -- その他のレベルのヘッダーはそのまま
     return el
 end
