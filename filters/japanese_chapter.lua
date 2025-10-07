@@ -12,7 +12,8 @@ local exclude_patterns = {
     "付録",
     "ListofFigures",
     "ListofTables", 
-    "ListofListings"
+    "ListofListings",
+    "修士論文"
 }
 
 -- ヘッダーテキストを取得するヘルパー関数
