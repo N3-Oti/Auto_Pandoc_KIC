@@ -1,7 +1,9 @@
 -- Pandocの標準的なフィルターパターンに従った実装
 local chapter_count = 0
 local current_chapter = 0
-local section_counts = {}
+local section_counts = {}  -- 各章のセクション数を記録
+local subsection_counts = {}  -- 各セクションのサブセクション数を記録
+local subsubsection_counts = {}  -- 各サブセクションのサブサブセクション数を記録
 
 -- 除外パターンの定義
 local exclude_patterns = {
@@ -82,6 +84,8 @@ function Header(el)
         chapter_count = chapter_count + 1
         current_chapter = chapter_count
         section_counts[current_chapter] = 0
+        subsection_counts[current_chapter] = {}
+        subsubsection_counts[current_chapter] = {}
         
         -- カスタム章番号を付与
         local prefix = pandoc.Str("第" .. tostring(chapter_count) .. "章")
@@ -100,6 +104,10 @@ function Header(el)
         section_counts[current_chapter] = section_counts[current_chapter] + 1
         local section_num = section_counts[current_chapter]
         
+        -- サブセクションとサブサブセクションのカウンターをリセット
+        subsection_counts[current_chapter][section_num] = 0
+        subsubsection_counts[current_chapter][section_num] = {}
+        
         -- カスタムセクション番号を付与
         local prefix = pandoc.Str(tostring(current_chapter) .. "." .. tostring(section_num))
         el.content:insert(1, pandoc.Space())
@@ -110,6 +118,48 @@ function Header(el)
         
         -- Pandocの自動番号付けを無効化
         return make_unnumbered(el)
+    end
+    
+    -- 第3レベルのヘッダー（サブセクション）の処理
+    if el.level == 3 and current_chapter > 0 and section_counts[current_chapter] > 0 then
+        local section_num = section_counts[current_chapter]
+        subsection_counts[current_chapter][section_num] = subsection_counts[current_chapter][section_num] + 1
+        local subsection_num = subsection_counts[current_chapter][section_num]
+        
+        -- サブサブセクションのカウンターをリセット
+        subsubsection_counts[current_chapter][section_num][subsection_num] = 0
+        
+        -- カスタムサブセクション番号を付与
+        local prefix = pandoc.Str(tostring(current_chapter) .. "." .. tostring(section_num) .. "." .. tostring(subsection_num))
+        el.content:insert(1, pandoc.Space())
+        el.content:insert(1, prefix)
+        
+        local header_text = get_header_text(el.content)
+        print("サブセクション番号付与: " .. tostring(current_chapter) .. "." .. tostring(section_num) .. "." .. tostring(subsection_num) .. " - " .. header_text)
+        
+        -- Pandocの自動番号付けを無効化
+        return make_unnumbered(el)
+    end
+    
+    -- 第4レベルのヘッダー（サブサブセクション）の処理
+    if el.level == 4 and current_chapter > 0 and section_counts[current_chapter] > 0 then
+        local section_num = section_counts[current_chapter]
+        if subsection_counts[current_chapter][section_num] and subsection_counts[current_chapter][section_num] > 0 then
+            local subsection_num = subsection_counts[current_chapter][section_num]
+            subsubsection_counts[current_chapter][section_num][subsection_num] = subsubsection_counts[current_chapter][section_num][subsection_num] + 1
+            local subsubsection_num = subsubsection_counts[current_chapter][section_num][subsection_num]
+            
+            -- カスタムサブサブセクション番号を付与
+            local prefix = pandoc.Str(tostring(current_chapter) .. "." .. tostring(section_num) .. "." .. tostring(subsection_num) .. "." .. tostring(subsubsection_num))
+            el.content:insert(1, pandoc.Space())
+            el.content:insert(1, prefix)
+            
+            local header_text = get_header_text(el.content)
+            print("サブサブセクション番号付与: " .. tostring(current_chapter) .. "." .. tostring(section_num) .. "." .. tostring(subsection_num) .. "." .. tostring(subsubsection_num) .. " - " .. header_text)
+            
+            -- Pandocの自動番号付けを無効化
+            return make_unnumbered(el)
+        end
     end
     
     -- その他のレベルのヘッダーはそのまま

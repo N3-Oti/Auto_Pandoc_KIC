@@ -4,7 +4,7 @@ to: docx
 standalone: true
 number-sections: true
 toc: true
-toc-depth: 3
+toc-depth: 4
 lot: true
 lof: true
 

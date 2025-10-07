@@ -74,26 +74,26 @@ jobs:
       - name: Get chapter files and convert with Pandoc
         run: |
           echo "=== DEBUG: Getting chapter files ==="
-          
+
           # chaptersディレクトリの.mdファイルを番号順にソートして取得
           CHAPTER_FILES=$(find ./chapters -name "*.md" | sort)
-          
+
           echo "Found chapter files:"
           echo "$CHAPTER_FILES"
-          
+
           # Pandocコマンドの引数を構築
           PANDOC_ARGS="--defaults=defaults.yaml --citeproc --bibliography=references.bib $REFERENCE_DOC -V toc-title=目次 -V lot-title=表目次 -V lof-title=図目次 --filter=pandoc-crossref --output=output/thesis.docx"
-          
+
           # 章ファイルを追加
           for file in $CHAPTER_FILES; do
             PANDOC_ARGS="$PANDOC_ARGS $file"
           done
-          
+
           echo "=== DEBUG: Pandoc arguments ==="
           echo "$PANDOC_ARGS"
-          
+
           echo "=== END DEBUG ==="
-          
+
           # Pandocの引数を環境変数として設定
           echo "PANDOC_ARGS=$PANDOC_ARGS" >> $GITHUB_ENV
 
