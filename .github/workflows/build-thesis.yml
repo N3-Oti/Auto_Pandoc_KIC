@@ -81,23 +81,29 @@ jobs:
           echo "Found chapter files:"
           echo "$CHAPTER_FILES"
           
-          # Pandocコマンドを構築
-          PANDOC_CMD="pandoc --defaults=defaults.yaml --citeproc --bibliography=references.bib $REFERENCE_DOC -V toc-title=目次 -V lot-title=表目次 -V lof-title=図目次 --filter=pandoc-crossref --output=output/thesis.docx"
+          # Pandocコマンドの引数を構築
+          PANDOC_ARGS="--defaults=defaults.yaml --citeproc --bibliography=references.bib $REFERENCE_DOC -V toc-title=目次 -V lot-title=表目次 -V lof-title=図目次 --filter=pandoc-crossref --output=output/thesis.docx"
           
           # 章ファイルを追加
           for file in $CHAPTER_FILES; do
-            PANDOC_CMD="$PANDOC_CMD $file"
+            PANDOC_ARGS="$PANDOC_ARGS $file"
           done
           
-          echo "=== DEBUG: Full Pandoc command ==="
-          echo "$PANDOC_CMD"
-          
-          # Pandocコマンドを実行
-          eval $PANDOC_CMD
+          echo "=== DEBUG: Pandoc arguments ==="
+          echo "$PANDOC_ARGS"
           
           echo "=== END DEBUG ==="
+          
+          # Pandocの引数を環境変数として設定
+          echo "PANDOC_ARGS=$PANDOC_ARGS" >> $GITHUB_ENV
 
-      # 6. 変換結果の確認
+      # 6. DockerでPandocを実行して変換
+      - name: Convert documents with Pandoc
+        uses: docker://pandoc/latex:3.5
+        with:
+          args: ${{ env.PANDOC_ARGS }}
+
+      # 7. 変換結果の確認
       - name: Verify conversion results
         run: |
           echo "=== DEBUG: Conversion Results ==="
@@ -113,7 +119,7 @@ jobs:
           fi
           echo "=== END DEBUG ==="
 
-      # 7. 生成されたWordファイルをアーティファクトとしてアップロードする
+      # 8. 生成されたWordファイルをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
