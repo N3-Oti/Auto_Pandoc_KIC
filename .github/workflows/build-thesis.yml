@@ -28,7 +28,18 @@ jobs:
       - name: Create output directory
         run: mkdir -p output
 
-      # 3. Pandocとpandoc-crossrefを使用してドキュメントを変換
+      # 3. reference.docxが存在するかチェック
+      - name: Check for reference.docx
+        run: |
+          if [ -f "reference.docx" ]; then
+            echo "reference.docx found, will use as template"
+            echo "REFERENCE_DOC=--reference-doc=reference.docx" >> $GITHUB_ENV
+          else
+            echo "reference.docx not found, using default template"
+            echo "REFERENCE_DOC=" >> $GITHUB_ENV
+          fi
+
+      # 4. Pandocとpandoc-crossrefを使用してドキュメントを変換
       # 公式例に基づいて、Dockerイメージを直接使用
       - name: Convert documents with Pandoc
         uses: docker://pandoc/latex:3.5
@@ -37,6 +48,7 @@ jobs:
             --defaults=defaults.yaml
             --citeproc
             --bibliography=references.bib
+            ${{ env.REFERENCE_DOC }}
             -V toc-title=目次
             -V lot-title=表目次
             -V lof-title=図目次
@@ -57,7 +69,7 @@ jobs:
             ./chapters/12_references_heading.md
             ./chapters/13_appendix.md
 
-      # 4. 生成されたWordファイルをアーティファクトとしてアップロードする
+      # 5. 生成されたWordファイルをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
