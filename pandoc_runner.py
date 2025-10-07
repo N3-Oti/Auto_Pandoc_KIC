@@ -154,6 +154,12 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
         if filter_crossref:
             cmd.extend(["--filter", "pandoc-crossref"])
     
+    # 目次タイトルの日本語化のため、直接変数を指定
+    cmd.extend(["-V", "toc-title=目次"])
+    cmd.extend(["-V", "lot-title=表目次"])
+    cmd.extend(["-V", "lof-title=図目次"])
+    print("目次タイトル変数を直接指定: toc-title=目次, lot-title=表目次, lof-title=図目次")
+    
     # citeproc for bibliography
     cmd.extend(["--citeproc"])
     
