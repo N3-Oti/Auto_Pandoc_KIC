@@ -8,28 +8,28 @@ toc-depth: 4
 lot: true
 lof: true
 
-# フィルターの設定
+# フィルターの設定（デバッグ用：図表関連の日本語化フィルターをコメントアウト）
 filters:
   - pandoc-crossref
-  - filters/japanese_chapter.lua
-  - filters/japanese_toc_titles.lua
+  # - filters/japanese_chapter.lua
+  # - filters/japanese_toc_titles.lua
   - filters/japanese_paragraph_indent.lua
   - filters/auto_date.lua
 
-# 文書全体のメタデータ
+# 文書全体のメタデータ（デバッグ用：図表の日本語接頭辞をコメントアウト）
 metadata:
   autoSectionLabels: true
-  # pandoc-crossref 用の接頭辞設定
-  figPrefix: "図 "
-  tblPrefix: "表 "
-  lstPrefix: "コード "
-  chapDelim: "."
+  # pandoc-crossref 用の接頭辞設定（デバッグ用：英語のまま）
+  # figPrefix: "図 "
+  # tblPrefix: "表 "
+  # lstPrefix: "コード "
+  # chapDelim: "."
   # 参考文献の設定
   bibliography: references.bib
   csl: chicago-author-date.csl
   reference-section-title: "参考文献"
 
-# テンプレートに渡す変数
+# テンプレートに渡す変数（デバッグ用：目次タイトルの日本語をコメントアウト）
 variables:
   fontsize: 11pt
   documentclass: bxjsreport
@@ -44,7 +44,7 @@ variables:
 
   # Word出力ではLaTeXの設定は効かないため削除
   
-  # 各種タイトルの設定
-  toc-title: "目次"
-  lot-title: "表目次"
-  lof-title: "図目次"
+  # 各種タイトルの設定（デバッグ用：全てコメントアウト）
+  # toc-title: "目次"
+  # lot-title: "表目次"
+  # lof-title: "図目次"
