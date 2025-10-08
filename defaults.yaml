@@ -24,6 +24,9 @@ metadata:
   tblPrefix: "表 "
   lstPrefix: "コード "
   chapDelim: "."
+  # 参考文献の設定
+  csl: chicago-author-date.csl
+  reference-section-title: "参考文献"
 
 # テンプレートに渡す変数
 variables:
