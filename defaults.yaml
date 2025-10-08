@@ -25,6 +25,7 @@ metadata:
   lstPrefix: "コード "
   chapDelim: "."
   # 参考文献の設定
+  bibliography: references.bib
   csl: chicago-author-date.csl
   reference-section-title: "参考文献"
 
