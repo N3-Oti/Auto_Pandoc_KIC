@@ -32,8 +32,9 @@ metadata:
   lotTitle: "## 表目次"
   lolTitle: "## コード目次"
   # 参考文献の設定
-  bibliography: references.bib
-  csl: chicago-author-date.csl
+  # bibliography: references.bib
+  # csl: chicago-author-date.csl  # CSLファイルが存在しないためコメントアウト
+  # 参考文献は手動で整形されているため、citeprocは使用しない
   reference-section-title: "参考文献"
 
 # テンプレートに渡す変数
