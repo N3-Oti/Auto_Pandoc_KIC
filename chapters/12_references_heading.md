@@ -4,4 +4,5 @@
 
 参考文献の書き方については情報処理学会の論文誌ジャーナル（IPSJ Journal）原稿執筆案内（https://www.ipsj.or.jp/journal/submit/ronbun_j_prms.html）のなかの「付録　参考文献の記載方法」を参照のこと。
 
-（ここに参考文献リストが自動生成されます）
+[1] [未定義の参考文献: fig]
+[2] [未定義の参考文献: tbl]

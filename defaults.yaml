@@ -14,6 +14,7 @@ filters:
   - filters/japanese_chapter.lua
   - filters/japanese_toc_titles.lua
   - filters/japanese_paragraph_indent.lua
+  - filters/auto_date.lua
 
 # 文書全体のメタデータ
 metadata:
@@ -23,6 +24,17 @@ metadata:
   tblPrefix: "表 "
   lstPrefix: "コード "
   chapDelim: "."
+  # 図表目次のタイトル設定
+  figureTitle: "図 "
+  tableTitle: "表 "
+  listingTitle: "コード "
+  lofTitle: "## 図目次"
+  lotTitle: "## 表目次"
+  lolTitle: "## コード目次"
+  # 参考文献の設定
+  bibliography: references.bib
+  csl: chicago-author-date.csl
+  reference-section-title: "参考文献"
 
 # テンプレートに渡す変数
 variables:

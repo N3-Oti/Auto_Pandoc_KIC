@@ -1,4 +1,4 @@
-# ワークフローの名前
+# サブモジュール用の論文ビルドワークフロー（修正版）
 name: Build Thesis Document
 
 # ワークフローが実行されるトリガーを指定
@@ -12,6 +12,10 @@ on:
   # 手動でも実行できるようにする
   workflow_dispatch:
 
+  # メインリポジトリからの呼び出し
+  repository_dispatch:
+    types: [thesis-build-requested]
+
 # 実行されるジョブを定義
 jobs:
   build:
@@ -24,11 +28,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. 出力ディレクトリを作成
+      # 2. メインリポジトリからの呼び出し情報を表示
+      - name: Display build information
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "🎯 メインリポジトリからのビルド要求を受信"
+          echo "📋 呼び出し情報:"
+          echo "  - ソース: ${{ github.event.client_payload.source }}"
+          echo "  - タイムスタンプ: ${{ github.event.client_payload.timestamp }}"
+          echo "  - メインリポジトリ: ${{ github.event.client_payload.main_repo }}"
+          echo "  - コミットSHA: ${{ github.event.client_payload.commit_sha }}"
+
+      # 3. 出力ディレクトリを作成
       - name: Create output directory
         run: mkdir -p output
 
-      # 3. reference.docxが存在するかチェック（デバッグログ付き）
+      # 4. reference.docxが存在するかチェック（デバッグログ付き）
       - name: Check for reference.docx
         run: |
           echo "=== DEBUG: Checking for reference.docx ==="
@@ -52,7 +67,7 @@ jobs:
           echo "REFERENCE_DOC environment variable set to: ${{ env.REFERENCE_DOC }}"
           echo "=== END DEBUG ==="
 
-      # 4. Pandocコマンドの詳細ログを表示
+      # 5. Pandocコマンドの詳細ログを表示
       - name: Show Pandoc command details
         run: |
           echo "=== DEBUG: Pandoc Command Details ==="
@@ -70,7 +85,7 @@ jobs:
           done
           echo "=== END DEBUG ==="
 
-      # 5. 章ファイルを自動取得してPandocで変換
+      # 6. 章ファイルを自動取得してPandocで変換
       - name: Get chapter files and convert with Pandoc
         run: |
           echo "=== DEBUG: Getting chapter files ==="
@@ -97,13 +112,13 @@ jobs:
           # Pandocの引数を環境変数として設定
           echo "PANDOC_ARGS=$PANDOC_ARGS" >> $GITHUB_ENV
 
-      # 6. DockerでPandocを実行して変換
+      # 7. DockerでPandocを実行して変換
       - name: Convert documents with Pandoc
         uses: docker://pandoc/latex:3.5
         with:
           args: ${{ env.PANDOC_ARGS }}
 
-      # 7. 変換結果の確認
+      # 8. 変換結果の確認
       - name: Verify conversion results
         run: |
           echo "=== DEBUG: Conversion Results ==="
@@ -119,7 +134,7 @@ jobs:
           fi
           echo "=== END DEBUG ==="
 
-      # 8. 生成されたWordファイルをアーティファクトとしてアップロードする
+      # 9. 生成されたWordファイルをアーティファクトとしてアップロードする
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -127,3 +142,11 @@ jobs:
           name: thesis-document
           # アップロードするファイルのパス
           path: output/
+
+      # 10. メインリポジトリに結果を通知（オプション）
+      - name: Notify main repository
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "🎉 論文ビルドが完了しました！"
+          echo "📋 メインリポジトリ: ${{ github.event.client_payload.main_repo }}"
+          echo "📄 WordファイルはArtifactsからダウンロードできます"

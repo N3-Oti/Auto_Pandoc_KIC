@@ -1,5 +1,6 @@
 -- 日本語段落の行頭スペース自動挿入フィルター
 -- 見出しの直後の段落に全角スペースを自動挿入する
+-- 改行を保持しつつ、適切にインデントを処理する
 
 print("日本語段落インデントフィルターが開始されました")
 
@@ -50,6 +51,52 @@ function Para(el)
         previous_element_was_header = false
     end
     
+    -- 段落内の改行処理を追加
+    local new_content = {}
+    local i = 1
+    while i <= #el.content do
+        local inline = el.content[i]
+        
+        if inline.t == "SoftBreak" then
+            -- ソフト改行を保持し、次の行の先頭に全角スペースを追加
+            table.insert(new_content, inline)
+            -- 次の要素が文字列の場合、全角スペースを追加
+            if i + 1 <= #el.content and el.content[i + 1].t == "Str" then
+                local next_text = el.content[i + 1].text
+                if not next_text:match("^　") then
+                    el.content[i + 1] = pandoc.Str("　" .. next_text)
+                end
+            end
+        elseif inline.t == "LineBreak" then
+            -- ハード改行を保持し、次の行の先頭に全角スペースを追加
+            table.insert(new_content, inline)
+            -- 次の要素が文字列の場合、全角スペースを追加
+            if i + 1 <= #el.content and el.content[i + 1].t == "Str" then
+                local next_text = el.content[i + 1].text
+                if not next_text:match("^　") then
+                    el.content[i + 1] = pandoc.Str("　" .. next_text)
+                end
+            end
+        else
+            table.insert(new_content, inline)
+        end
+        
+        i = i + 1
+    end
+    
+    el.content = new_content
+    return el
+end
+
+-- 改行を保持するためのSoftBreak処理
+function SoftBreak(el)
+    -- ソフト改行を保持（改行を消さない）
+    return el
+end
+
+-- ハード改行を保持するためのLineBreak処理
+function LineBreak(el)
+    -- ハード改行を保持（改行を消さない）
     return el
 end
 
