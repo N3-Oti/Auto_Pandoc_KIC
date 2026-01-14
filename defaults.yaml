@@ -20,14 +20,17 @@ filters:
 metadata:
   autoSectionLabels: true
   # pandoc-crossref 用の接頭辞設定
-  figPrefix: "図 "
-  tblPrefix: "表 "
-  lstPrefix: "コード "
+  # NOTE:
+  # - pandoc-crossref側で接頭辞と番号の区切り（スペース等）を付与するため、
+  #   ここに末尾スペースを入れると「表␠␠1」のような二重スペースになり得る。
+  figPrefix: "図"
+  tblPrefix: "表"
+  lstPrefix: "コード"
   chapDelim: "."
   # 図表目次のタイトル設定
-  figureTitle: "図 "
-  tableTitle: "表 "
-  listingTitle: "コード "
+  figureTitle: "図"
+  tableTitle: "表"
+  listingTitle: "コード"
   lofTitle: "## 図目次"
   lotTitle: "## 表目次"
   lolTitle: "## コード目次"
