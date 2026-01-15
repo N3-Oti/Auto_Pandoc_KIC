@@ -171,6 +171,14 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     else:
         print("警告: defaults.yamlが見つかりません。デフォルト設定を使用します。")
         # defaults.yamlがない場合のフォールバック設定
+        # **太字** がそのまま残ってしまうケースへの対策として、強調を除去するLuaフィルタを適用
+        strip_strong_filter = os.path.join("filters", "strip_strong.lua")
+        if os.path.exists(strip_strong_filter):
+            cmd.extend(["--lua-filter", strip_strong_filter])
+            print(f"Luaフィルタ適用: {strip_strong_filter}（強調 '**' を除去）")
+        else:
+            print(f"警告: Luaフィルタが見つかりません: {strip_strong_filter}")
+
         if filter_crossref:
             cmd.extend(["--filter", "pandoc-crossref"])
     
@@ -197,16 +205,16 @@ def run_pandoc(source_files, output_file, reference_doc=None, filter_crossref=Tr
     
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(f"✓ 変換成功: {output_file}")
+        print(f"OK: 変換成功: {output_file}")
         if result.stdout:
             print(result.stdout)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"✗ エラー: Pandocの実行に失敗しました")
+        print("ERROR: Pandocの実行に失敗しました")
         print(f"エラーメッセージ: {e.stderr}")
         sys.exit(1)
     except FileNotFoundError:
-        print("✗ エラー: Pandocが見つかりません。インストールされているか確認してください。")
+        print("ERROR: Pandocが見つかりません。インストールされているか確認してください。")
         sys.exit(1)
 
 

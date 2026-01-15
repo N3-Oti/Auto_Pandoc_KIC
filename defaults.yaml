@@ -10,6 +10,7 @@ lof: true
 
 # フィルターの設定
 filters:
+  - filters/strip_strong.lua
   - pandoc-crossref
   - filters/japanese_chapter.lua
   - filters/japanese_toc_titles.lua
