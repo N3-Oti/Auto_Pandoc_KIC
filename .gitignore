@@ -1,1 +1,4 @@
 /.vscode
+
+# Microsoft Word temporary lock files
+~$*.docx
